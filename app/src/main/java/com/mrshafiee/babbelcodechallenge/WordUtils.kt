@@ -3,6 +3,7 @@ package com.mrshafiee.babbelcodechallenge
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.mrshafiee.babbelcodechallenge.model.Word
+import kotlin.random.Random
 
 class WordUtils {
 
@@ -23,4 +24,10 @@ class WordUtils {
         englishText: String,
         spanishText: String
     ) = words.first { word: Word -> word.english == englishText }.spanish != spanishText
+
+    fun pickRandomOriginalWord(words: List<Word>) =
+        words[Random.nextInt(0, words.size - 1)].english
+
+    fun pickRandomTranslatedWord(words: List<Word>) =
+        words[Random.nextInt(0, words.size - 1)].spanish
 }
