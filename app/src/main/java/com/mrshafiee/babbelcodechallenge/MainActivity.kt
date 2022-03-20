@@ -13,6 +13,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        json = viewModel.loadJSONFromAsset(this, "Languages.json")
+        json = viewModel.loadJSONFromAsset(this, "Words.json")
     }
 }
