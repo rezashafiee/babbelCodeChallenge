@@ -12,7 +12,6 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.lifecycle.lifecycleScope
 import com.mrshafiee.babbelcodechallenge.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -35,19 +34,34 @@ class MainActivity : ComponentActivity() {
         viewModel.provideNewOriginalWord()
         viewModel.provideNewTranslatedWord()
 
-        lifecycleScope.launch(Main) {
+        lifecycleScope.launch {
             viewModel.originalWord.collectLatest {
                 binding.tvOriginalWord.text = it
             }
         }
 
-        lifecycleScope.launch(Main) {
+        lifecycleScope.launch {
             viewModel.translatedWord.collectLatest {
                 val wordTextView = addTranslatedWordOnBoard(it)
                 moveTranslatedWordToBottom(wordTextView)
             }
         }
 
+        lifecycleScope.launch {
+            viewModel.noAnswersCounter.collectLatest {
+                binding.tvNoAnswersCount.text = it.toString()
+            }
+        }
+        lifecycleScope.launch {
+            viewModel.wrongAnswersCounter.collectLatest {
+                binding.tvWrongAnswersCount.text = it.toString()
+            }
+        }
+        lifecycleScope.launch {
+            viewModel.correctAnswersCounter.collectLatest {
+                binding.tvCorrectAnswersCount.text = it.toString()
+            }
+        }
     }
 
     private fun addTranslatedWordOnBoard(text: String): View {
@@ -85,7 +99,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun moveTranslatedWordToBottom(view: View) {
-        lifecycleScope.launch(Main) {
+        lifecycleScope.launch {
             viewModel.startObjectMovement(
                 1.0f
             ).collectLatest {
@@ -93,6 +107,8 @@ class MainActivity : ComponentActivity() {
                 lp.verticalBias = it
                 view.layoutParams = lp
             }
+        }.invokeOnCompletion {
+            onNoAnswer()
         }
     }
 
@@ -102,6 +118,9 @@ class MainActivity : ComponentActivity() {
 
     private fun onNoAnswer() {
         viewModel.increaseNoAnswersCounter()
+        removeTranslatedWordFromBoard()
+        viewModel.provideNewOriginalWord()
+        viewModel.provideNewTranslatedWord()
     }
 
     private fun onCorrectButtonClicked() {
