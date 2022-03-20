@@ -17,7 +17,7 @@ class MainViewModelTest {
 
     @Before
     fun setUp() {
-        viewModel = MainViewModel()
+        viewModel = MainViewModel(WordUtils())
     }
 
     @After

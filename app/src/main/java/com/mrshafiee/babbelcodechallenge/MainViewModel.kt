@@ -26,6 +26,15 @@ class MainViewModel @Inject constructor(
     private val _translatedWordStateFlow = MutableStateFlow("")
     val translatedWord = _translatedWordStateFlow.asStateFlow()
 
+    private val _wrongAnswersStateFlow = MutableStateFlow(0)
+    val wrongAnswersCounter = _wrongAnswersStateFlow.asStateFlow()
+
+    private val _correctAnswersStateFlow = MutableStateFlow(0)
+    val correctAnswersCounter = _correctAnswersStateFlow.asStateFlow()
+
+    private val _noAnswersStateFlow = MutableStateFlow(0)
+    val noAnswersCounter = _noAnswersStateFlow.asStateFlow()
+
 
     fun loadWordListFromJson(json: String) {
         wordList.addAll(wordUtils.convertJsonStringToWordList(json))
@@ -72,4 +81,16 @@ class MainViewModel @Inject constructor(
 
     fun onWrongButtonClicked() =
         wordUtils.checkTheWrongAnswer(wordList, originalWord.value, translatedWord.value)
+
+    fun increaseCorrectAnswersCounter() {
+        _correctAnswersStateFlow.value++
+    }
+
+    fun increaseWrongAnswersCounter() {
+        _wrongAnswersStateFlow.value++
+    }
+
+    fun increaseNoAnswersCounter() {
+        _noAnswersStateFlow.value++
+    }
 }

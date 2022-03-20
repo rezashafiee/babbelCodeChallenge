@@ -21,7 +21,6 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
-    private var json: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,8 +32,22 @@ class MainActivity : ComponentActivity() {
             viewModel.loadWordListFromJson(it)
         }
 
-        val wordTextView = addTranslatedWordOnBoard("Imchini")
-        moveTranslatedWordToBottom(wordTextView)
+        viewModel.provideNewOriginalWord()
+        viewModel.provideNewTranslatedWord()
+
+        lifecycleScope.launch(Main) {
+            viewModel.originalWord.collectLatest {
+                binding.tvOriginalWord.text = it
+            }
+        }
+
+        lifecycleScope.launch(Main) {
+            viewModel.translatedWord.collectLatest {
+                val wordTextView = addTranslatedWordOnBoard(it)
+                moveTranslatedWordToBottom(wordTextView)
+            }
+        }
+
     }
 
     private fun addTranslatedWordOnBoard(text: String): View {
@@ -85,5 +98,17 @@ class MainActivity : ComponentActivity() {
 
     private fun removeTranslatedWordFromBoard() {
         binding.clTranslatedWordContainer.removeAllViews()
+    }
+
+    private fun onNoAnswer() {
+        viewModel.increaseNoAnswersCounter()
+    }
+
+    private fun onCorrectButtonClicked() {
+        viewModel.increaseCorrectAnswersCounter()
+    }
+
+    private fun onWrongButtonClicked() {
+        viewModel.increaseWrongAnswersCounter()
     }
 }
