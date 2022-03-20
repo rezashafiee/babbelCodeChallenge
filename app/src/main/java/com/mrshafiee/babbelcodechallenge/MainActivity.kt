@@ -5,13 +5,17 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.widget.TextView
+import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.lifecycle.lifecycleScope
 import com.mrshafiee.babbelcodechallenge.databinding.ActivityMainBinding
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
@@ -24,10 +28,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
 
         json = viewModel.loadJSONFromAsset(this, "Words.json")
-        addTranslatedWordOnBoard("Imchini")
+
+        val wordTextView = addTranslatedWordOnBoard("Imchini")
+        moveTranslatedWordToBottom(wordTextView)
     }
 
-    private fun addTranslatedWordOnBoard(text: String) {
+    private fun addTranslatedWordOnBoard(text: String): View {
         val wordTextView = TextView(this)
         wordTextView.id = View.generateViewId()
         wordTextView.text = text
@@ -58,10 +64,19 @@ class MainActivity : AppCompatActivity() {
         )
 
         constraintSet.applyTo(binding.clTranslatedWordContainer)
+        return wordTextView
     }
 
-    private fun moveTranslatedWordToBottom() {
-
+    private fun moveTranslatedWordToBottom(view: View) {
+        lifecycleScope.launch(Main) {
+            viewModel.startObjectMovement(
+                1.0f
+            ).collectLatest {
+                val lp = view.layoutParams as ConstraintLayout.LayoutParams
+                lp.verticalBias = it
+                view.layoutParams = lp
+            }
+        }
     }
 
     private fun removeTranslatedWordFromBoard() {

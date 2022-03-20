@@ -2,8 +2,11 @@ package com.mrshafiee.babbelcodechallenge
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import java.io.IOException
-
 
 class MainViewModel : ViewModel() {
 
@@ -23,4 +26,15 @@ class MainViewModel : ViewModel() {
         return jsonContent
     }
 
+
+    fun startObjectMovement(endPosition: Float) = flow {
+        val startPosition = 0f
+        var currentPosition = startPosition
+        emit(startPosition)
+        while (currentPosition <= endPosition) {
+            delay(5)
+            currentPosition += 0.001f
+            emit(currentPosition)
+        }
+    }.flowOn(IO)
 }
