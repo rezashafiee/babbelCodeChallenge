@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">BabbelCodeChallenge</string>
+    <string name="correct_button_title">Correct</string>
+    <string name="wrong_button_text">Wrong</string>
+    <string name="correct_answers_label_title">Correct answers</string>
+    <string name="no_answers">No answers</string>
+    <string name="wrong_answers">Wrong answers</string>
 </resources>
