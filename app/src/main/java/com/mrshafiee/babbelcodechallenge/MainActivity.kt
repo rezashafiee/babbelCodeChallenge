@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.mrshafiee.babbelcodechallenge.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -34,6 +35,20 @@ class MainActivity : ComponentActivity() {
         viewModel.provideNewOriginalWord()
         viewModel.provideNewTranslatedWord()
 
+        initHandlers()
+        subscribeObservers()
+    }
+
+    private fun initHandlers() {
+        binding.tvWrongButton.setOnClickListener {
+            onWrongButtonClicked()
+        }
+        binding.tvCorrectButton.setOnClickListener {
+            onCorrectButtonClicked()
+        }
+    }
+
+    private fun subscribeObservers() {
         lifecycleScope.launch {
             viewModel.originalWord.collectLatest {
                 binding.tvOriginalWord.text = it
@@ -102,32 +117,40 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             viewModel.startObjectMovement(
                 1.0f
-            ).collectLatest {
+            ).onCompletion {
+                onNoAnswer()
+            }.collectLatest {
                 val lp = view.layoutParams as ConstraintLayout.LayoutParams
                 lp.verticalBias = it
                 view.layoutParams = lp
             }
-        }.invokeOnCompletion {
-            onNoAnswer()
         }
     }
 
-    private fun removeTranslatedWordFromBoard() {
+    private fun restartBoard() {
         binding.clTranslatedWordContainer.removeAllViews()
-    }
-
-    private fun onNoAnswer() {
-        viewModel.increaseNoAnswersCounter()
-        removeTranslatedWordFromBoard()
         viewModel.provideNewOriginalWord()
         viewModel.provideNewTranslatedWord()
     }
 
+    private fun onNoAnswer() {
+        viewModel.increaseNoAnswersCounter()
+        restartBoard()
+    }
+
     private fun onCorrectButtonClicked() {
-        viewModel.increaseCorrectAnswersCounter()
+        if (viewModel.onCorrectButtonClicked()) {
+            viewModel.increaseCorrectAnswersCounter()
+        } else
+            viewModel.increaseWrongAnswersCounter()
+        restartBoard()
     }
 
     private fun onWrongButtonClicked() {
-        viewModel.increaseWrongAnswersCounter()
+        if (viewModel.onWrongButtonClicked()) {
+            viewModel.increaseCorrectAnswersCounter()
+        } else
+            viewModel.increaseWrongAnswersCounter()
+        restartBoard()
     }
 }
