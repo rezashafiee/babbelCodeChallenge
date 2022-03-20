@@ -11,10 +11,12 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.lifecycle.lifecycleScope
 import com.mrshafiee.babbelcodechallenge.databinding.ActivityMainBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -27,7 +29,9 @@ class MainActivity : ComponentActivity() {
         val view = binding.root
         setContentView(view)
 
-        json = viewModel.loadJSONFromAsset(this, "Words.json")
+        viewModel.loadJSONFromAsset(this, "Words.json")?.let {
+            viewModel.loadWordListFromJson(it)
+        }
 
         val wordTextView = addTranslatedWordOnBoard("Imchini")
         moveTranslatedWordToBottom(wordTextView)
@@ -80,6 +84,6 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun removeTranslatedWordFromBoard() {
-
+        binding.clTranslatedWordContainer.removeAllViews()
     }
 }
