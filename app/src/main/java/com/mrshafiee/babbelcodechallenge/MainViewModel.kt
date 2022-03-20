@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.mrshafiee.babbelcodechallenge.model.Word
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -66,7 +66,7 @@ class MainViewModel @Inject constructor(
             currentPosition += 0.001f
             emit(currentPosition)
         }
-    }.flowOn(IO)
+    }.flowOn(Default)
 
     fun provideNewOriginalWord() {
         _originalWordStateFlow.value = wordUtils.pickRandomOriginalWord(wordList)
